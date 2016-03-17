@@ -17,11 +17,9 @@ public class Go9 extends Game {
     public void restart() {
         board_state = new ArrayList<>(83);
         board_state.add((byte)1);
-        for (int j = 1; j <= 81; j++) {
+        for (int j = 1; j <= 81 + 4; j++) {
             board_state.add((byte)0);
         }
-		board_state.add((byte)0);
-		board_state.add((byte)0);
     }
 
     public ArrayList<Byte> legalMoves(ArrayList<Byte> board) {
@@ -39,7 +37,7 @@ public class Go9 extends Game {
         return moves;
     } 
 	
-	//board state: 1 is top left point, goes right, 82 is number of consecutive passes, 83 is (0/else=no ko, move which is illegal)
+//board state: 1 is top left point, goes right, 82 is number of consecutive passes, 83 is (0/else=no ko, move which is illegal), 84 is white stones captured by black, 85 is whites pts for capture
 // moves 1-81 and 0 is pass
     public int simMove(byte m, ArrayList<Byte> board) {
 
@@ -65,7 +63,7 @@ public class Go9 extends Game {
 			}
 		}
 		
-		//Moving on a move or illegal ko
+		//Moving on a stone or illegal ko
 		if(board.get(m) != 0 || m == board.get(83)){
 			return -1;
 		}
@@ -98,9 +96,27 @@ public class Go9 extends Game {
     }
 
     public int getState(ArrayList<Byte> board) {
-
+		if(board.get(82) != 2){
+			return 0;
+		}
 	
-        return 0;
+		int[] points = new int[2];
+		
+		//add points for captures
+        points[0] = board.get(84);
+		
+		//white gets komi also
+		points[1] = board.get(85) + 7;
+		for(int j = 1; j <= 81; j++){
+			byte spaceValue = board.get(j);
+			if(spaceValue > 0){
+				points[spaceValue - 1] += 1;
+			}
+		}
+		
+		
+		//white wins tie (ie white gets a half pt)
+		return (points[1] >= points[0] ? 2 : 1);
     }
 
     public void printState(ArrayList<Byte> board) {
@@ -155,7 +171,7 @@ public class Go9 extends Game {
 
         void captureGroup(ArrayList<Byte> board, int p, byte turn){
             board.set(p, (byte)0);
-            board.set(82 + turn, (byte)(board.get(82 + turn) + 1));
+            board.set(84 + turn, (byte)(board.get(84 + turn) + 1));
             for(int j = 0; j < 4; j++){
                 int nextIndex = indexAndDir(p, j);
                 if(nextIndex != -1 && board.get(nextIndex) == 2-turn){

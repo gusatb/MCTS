@@ -3,7 +3,7 @@ import java.util.ArrayList;
 
 public class MCTS {
 
-    final int branch = 40; //set to max
+    final int branch = 81; //set to max
     final double epsilon = 1e-5;
     int playouts;
     Game game;
