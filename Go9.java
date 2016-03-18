@@ -29,10 +29,24 @@ public class Go9 extends Game {
         }
 		moves.add((byte)0);
 		byte illegalMove = board.get(83);
-        for (int j = 1; j <= 81; j++) {
-            if (board.get(j) == 0 && j != illegalMove) {
-                moves.add((byte)j);
+		
+		ArrayList<Byte> state = new ArrayList<>(board.size());
+        for (Byte i : board) {
+            state.add(i);
+        }
+		
+        for (byte j = 1; j <= 81; j++) {
+            if (board.get(j) != 0 || j == illegalMove) {
+                continue;
             }
+			int simReturn = simMove(j, state);
+			for (int i = 0; i < board.size(); i++) {
+                state.set(i, board.get(i));
+            }
+			if(simReturn == -1){
+				continue;
+			}
+			moves.add((byte)j);
         }
         return moves;
     } 
@@ -40,6 +54,7 @@ public class Go9 extends Game {
 //board state: 1 is top left point, goes right, 82 is number of consecutive passes, 83 is (0/else=no ko, move which is illegal), 84 is white stones captured by black, 85 is whites pts for capture
 // moves 1-81 and 0 is pass
     public int simMove(byte m, ArrayList<Byte> board) {
+
 
 		// if player passes
         if(m == 0){
@@ -64,7 +79,8 @@ public class Go9 extends Game {
 		}
 		
 		//Moving on a stone or illegal ko
-		if(board.get(m) != 0 || m == board.get(83)){
+		if(m < 0 || m > 81 || board.get(m) != 0 || m == board.get(83)){
+			//System.out.println("Illegal: " + m + " = " + board.get(m));
 			return -1;
 		}
 		
@@ -79,8 +95,9 @@ public class Go9 extends Game {
 		for(int j = 0; j < 82; j++){
 			checkBoard[j] = 0;
 		}
-		if(!hasLiberties(board, m, checkBoard, (byte)(turn - 1))){
-			board.set(m, turn);
+		if(!hasLiberties(board, m, checkBoard, (byte)(2 - turn))){
+		//System.out.println("Suicide: " + m);
+			board.set(m, (byte)0);
 			return -1;
 		}
 		
@@ -145,7 +162,7 @@ public class Go9 extends Game {
 	// Go functions
 	
 	    int indexAndDir(int p, int j){
-            int nextIndex = p + dirs[j].x * 9 + dirs[j].y;
+            int nextIndex = p + dirs[j].y * 9 + dirs[j].x;
             if((j == 0 && nextIndex % 9 == 0) || (j == 2 && nextIndex % 9 == 8) || (nextIndex <= 0) || ( nextIndex > 81)){
                 return -1;
             }
@@ -161,7 +178,7 @@ public class Go9 extends Game {
                     checkBoard[i] = 0;
                 }
                 int nextIndex = indexAndDir(p, j);
-                if(nextIndex != -1 && checkBoard[nextIndex] == 0 && board.get(nextIndex) == (turn%2)+1){
+                if(nextIndex != -1 && board.get(nextIndex) == 2-turn){
                     if(!hasLiberties(board, nextIndex, checkBoard, turn)){
                         captureGroup(board, nextIndex, turn);
                     }
@@ -182,6 +199,7 @@ public class Go9 extends Game {
 
         // p is the index in the board of a stone in the group to count liberties for
         boolean hasLiberties(ArrayList<Byte> board, int p, byte[] checkBoard, byte turn){
+		//System.out.println("hasLib: checking " + p);
             checkBoard[p] = 1;
             for(int j = 0; j < 4; j++){
                 int nextIndex = indexAndDir(p, j);

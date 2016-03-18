@@ -3,7 +3,7 @@ import java.util.ArrayList;
 
 public class MCTS {
 
-    final int branch = 81; //set to max
+    final int branch = 100; //set to max
     final double epsilon = 1e-5;
     int playouts;
     Game game;
@@ -41,7 +41,7 @@ public class MCTS {
 
     public boolean round() { //returns solved
         if (start.finished != 0) {
-            System.out.print("(SOLVED FOR: " + start.finished+") ");
+            System.out.print("(SOLVED FOR: " + start.finished+") " + start.children.size() + ":");
             return true;
         }
         Node n = selection();
@@ -61,7 +61,7 @@ public class MCTS {
         for (int j = 0; j < playouts; j++) {
             int result = simulation(leaf);
 
-            if (j==0 && leaf == n) {
+            if (leaf == n) {
 
                 if (result == -2) {
                     result = 3;
