@@ -1,5 +1,8 @@
 
 import java.util.ArrayList;
+import java.awt.*;
+import javax.swing.*;
+
 
 public class Go9 extends Game {
 
@@ -10,9 +13,51 @@ public class Go9 extends Game {
 // moves 1-81 and 0 is pass
 
 //Komi is 7.5, chinese rules
+
+
     public Go9() {
 		restart();
     }
+	
+	public void paintBoardState(Graphics g, int width, int height){
+		g.setColor(new Color(238, 154, 0));
+		g.fillRect(0, 0, width, height);
+		
+		int square_side = width / 12;
+		int buff = (width - (9 * square_side))/2;
+		int stone_width = 3 * square_side / 4;
+		int stone_radius = stone_width / 2;
+		
+		g.setColor(Color.BLACK);
+		for(int j = 0; j < 9; j++){
+			int point = buff + square_side * j;
+			g.drawLine(buff, point, width - buff - square_side, point);
+			g.drawLine(point, buff, point, height - buff - square_side);
+		}
+		
+		int hoshi_x = buff + 4 * square_side;
+		int hoshi_y = buff + 4 * square_side;
+		int hoshi_r = stone_radius / 2;
+		g.fillOval(hoshi_x - hoshi_r, hoshi_y - hoshi_r, hoshi_r*2, hoshi_r*2);
+		
+		for(int j = 1; j <= 81; j++){
+			int space = board_state.get(j);
+			if(space == 0){
+				continue;
+			}
+			Color color = space == 1 ? Color.BLACK : Color.WHITE;
+			g.setColor(color);
+			int x = (j-1)%9;
+			int y = (j-1)/9;
+			x = buff + x * square_side;
+			y = buff + y * square_side;
+			g.fillOval(x - stone_radius, y - stone_radius, stone_width, stone_width);
+			
+			g.setColor(Color.BLACK);
+			g.drawOval(x - stone_radius, y - stone_radius, stone_width, stone_width);
+		}
+		
+	}
 
     public void restart() {
         board_state = new ArrayList<>(83);
@@ -156,14 +201,14 @@ public class Go9 extends Game {
 	}
 
 	
-	final Point[] dirs = {new Point(-1, 0), new Point(0, -1), new Point(1, 0), new Point(0, 1)};
+	final int[] dirs = {-1, -9, 1, 9};
 	
 	
 	// Go functions
 	
 	    int indexAndDir(int p, int j){
-            int nextIndex = p + dirs[j].y * 9 + dirs[j].x;
-            if((j == 0 && nextIndex % 9 == 0) || (j == 2 && nextIndex % 9 == 8) || (nextIndex <= 0) || ( nextIndex > 81)){
+            int nextIndex = p + dirs[j];
+            if((j == 0 && nextIndex % 9 == 0) || (j == 2 && nextIndex % 9 == 1) || (nextIndex <= 0) || ( nextIndex > 81)){
                 return -1;
             }
             return nextIndex;

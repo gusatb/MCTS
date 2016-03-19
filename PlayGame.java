@@ -3,6 +3,9 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
+import java.awt.*;
+import javax.swing.*;
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -12,13 +15,16 @@ import java.util.ArrayList;
  *
  * @author Gus
  */
-public class PlayGame {
+public class PlayGame extends JFrame{
 
     //MCTS ai;
     int status;
     int mode; // 0 = play else multirun
     int p1wins = 0;
     int draws = 0;
+	
+    Game cf = null;
+	
 
     public static void main(String[] args) throws Exception {
         int play = 1;
@@ -26,9 +32,22 @@ public class PlayGame {
             play = (new PlayGame()).status;
         }
     }
+	
+	public void paint(Graphics g){
+		if(cf != null){
+			cf.paintBoardState(g, getWidth(), getHeight());
+		}
+	}
 
     public PlayGame() throws Exception {
-        Game cf;
+	
+		super();
+		setSize(600, 600);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setResizable(false);
+		setVisible(true);
+		
+	
         BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
 
         System.out.print("Select mode: \n\t0: Regular\n\telse: Quick-run\n>");
@@ -40,11 +59,11 @@ public class PlayGame {
         int game = Integer.parseInt(bf.readLine());
         //game initialized again in gn loop
         if (game == 1) {
-            cf = new TicTacToe();
+            //cf = new TicTacToe();
         } else if (game == 2) {
-            cf = new ConnectFour();
+            //cf = new ConnectFour();
         } else if(game == 3) {
-            cf = new DotsAndBoxes();
+            //cf = new DotsAndBoxes();
         } else{
 			cf = new Go9();
 		}
@@ -105,6 +124,7 @@ public class PlayGame {
                 do {
                     if (mode == 0) {
                         cf.printState(board);
+						repaint();
                         System.out.print("Player " + (p + 1) + ": ");
                     }else{
                         System.out.print("P" + (p + 1) + ": ");
@@ -153,6 +173,8 @@ public class PlayGame {
         if (mode != 0) {
             System.out.println("Results:\n\tPlayer 1 wins: " + p1wins + "\n\tPlayer 2 wins: " + (mode - p1wins - draws) + "\n\tDraws: " + draws + "\n");
         }
+		
+		cf = null;
     }
 }
 

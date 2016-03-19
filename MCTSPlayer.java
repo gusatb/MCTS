@@ -79,16 +79,16 @@ public class MCTSPlayer extends Player {
             //ai.playouts = playouts;
         }
         //System.out.println(ai.start.sims);
-        //int c = 0;
+        int c = 0;
         boolean solved = false;
         long start = System.currentTimeMillis();
         while ((!solved) && (System.currentTimeMillis() - start) <= seconds * 100) {
             solved = ai.round();
-            //c++;
+            c++;
             //if (c % 10000 == 0) System.out.println(c);
 
         }
-        //System.out.println("Rounds:"+c);
+        System.out.println("Rounds:"+c);
         //System.out.println("Sims:"+ai.start.sims);
         byte move = ai.getMove();
         //boolean changed = false;

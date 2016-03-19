@@ -1,6 +1,6 @@
 
 import java.util.ArrayList;
-
+import java.awt.Graphics;
 
 public abstract class Game {
     
@@ -17,4 +17,6 @@ public abstract class Game {
     public abstract int getState(ArrayList<Byte> board); //-2 for draw, 0 for not over, else winning player
     
     public abstract void printState(ArrayList<Byte> board) throws Exception;
+	
+	public abstract void paintBoardState(Graphics g, int width, int height);
 }
