@@ -19,4 +19,6 @@ public abstract class Game {
     public abstract void printState(ArrayList<Byte> board) throws Exception;
 	
 	public abstract void paintBoardState(Graphics g, int width, int height);
+	
+	//public abstract int getMove(int screenWidth, int screenHeight, int mouseX, int mouseY);
 }

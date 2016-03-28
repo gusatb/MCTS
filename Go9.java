@@ -19,6 +19,24 @@ public class Go9 extends Game {
 		restart();
     }
 	
+	// public int getMove(int screenWidth, int screenHeight, int mouseX, int mouseY){
+		// int square_side = width / 12;
+		// int buff = (width - (9 * square_side))/2;
+		// int stone_width = 3 * square_side / 4;
+		// int stone_radius = stone_width / 2;
+		
+		// double x = mouseX - buff + square_size/2;
+		// double y = mouseY - buff + square_size/2;
+		
+		// x /= square_side;
+		// y /= square_size;
+		// int ret = (Math.round(x) % 9) + (Math.round(y) * 9) + 1;
+		// if(ret < 1 || ret > 81){
+			// return 0;
+		// }
+		// return ret;
+	// }
+	
 	public void paintBoardState(Graphics g, int width, int height){
 		g.setColor(new Color(238, 154, 0));
 		g.fillRect(0, 0, width, height);

@@ -66,7 +66,7 @@ public class MCTS {
                 if (result == -2) {
                     result = 3;
                 }
-                if(n.parent != null) n.parent.finished = result;
+                //if(n.parent != null) n.parent.finished = result;
                 n.finished = result;
                 j = playouts;
             //if(n.parent == start){
@@ -99,75 +99,48 @@ public class MCTS {
         while (s.children.size() != 0) {
             int index = -1;
             double high = -2;
-            int sumfinished = 0;
-            int finishedtype = -1;
+			int finishCase = 0;
+			
+			boolean friendlyNode = s.state.get(0) == player;
             for (int j = 0; j < s.children.size(); j++) {
                 Node n = s.children.get(j);
-
-                long wins = n.wins;
-                if (s.state.get(0) != player) {
-                    wins = n.sims - n.wins;//opponents move
-                }
-                if (n.finished == 0) {
+                
+                if (n.finished == 0 || finishCase == -1) {
+					long wins = n.wins;
+					if (!friendlyNode) {
+						finishCase = -1;
+						wins = n.sims - n.wins;//opponents move, assumes draws = losses (which is bad)
+					}
                     double ucb = wins / (n.sims + epsilon) + Math.sqrt((Math.log(s.sims + 2) / (n.sims + epsilon)));
                     if (ucb > high) {
                         high = ucb;
                         index = j;
                     }
                 } else {
-                    if (finishedtype == -1) {
-                        finishedtype = n.finished;
-                        sumfinished += n.finished;
-                        if (n.finished == s.state.get(0)) {
-                            //index = j;
-                            //high = Double.POSITIVE_INFINITY;
-                            s.finished = n.finished;
-                            return null;
-                        } else if (n.finished == 3 && -1 > high) {
-                            high = -1;
-                            index = j;
-                        }
-                    } else if (finishedtype == n.finished) {
-                        sumfinished += n.finished;
-
-                    } else {
-                        finishedtype = -2;
-                        sumfinished = 0;
-                        if (n.finished == s.state.get(0)) {
-                            //index = j;
-                            //high = Double.POSITIVE_INFINITY;
-                            s.finished = n.finished;
-                            return null;
-                        } else if (n.finished == 3 && -1 > high) {
-                            high = -1;
-                            index = j;
-                        }
-                    }
-
+                    if (friendlyNode && n.finished == player) {
+                        //index = j;
+                        //high = Double.POSITIVE_INFINITY;
+                        s.finished = n.finished;
+                        return null;
+                    }else if(!friendlyNode){
+						if(n.finished != player){ // counts draws as losses
+							s.finished = n.finished;
+							return null;
+						}else if(n.finished == player){
+							finishCase = n.finished;
+						}
+					}
                 }
             }
-            int opp = 2;
-            if (s.state.get(0) == 2) {
-                opp = 1;
+			if(finishCase == player){
+				s.finished = finishCase;
+				return null;
+			}
+			
+            if (index == -1) { // cant win play randomly (should play for draw)
+                index = (int)(Math.random()*s.children.size());
             }
-            if (finishedtype == opp && sumfinished == s.children.size() * opp) {
-                //solved for opponent
-                s.finished = opp;
-                //if(s.parent!=null){
-                //    s = s.parent;
-                return null;
-                //}else{
-                //    return null;
-                //}
-            } else if (high == -1) { //best case draw
-                s.finished = 3;
-                return null;
-            } else if (index != -1) {
-                s = s.children.get(index);
-            } else if (index == -1) {
-                System.out.println("SOMETHINGS WRONG");
-                return null;
-            }
+			s = s.children.get(index);
         }
         return s;
     }
